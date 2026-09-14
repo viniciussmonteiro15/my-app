@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, TextInput, TouchableOpacity, Text, StyleSheet, Alert } from 'react-native';
 
-export const RaceForm = ({ onAddRace }) => {
+export default function RaceForm({ onSave, onClose }) {
   const [trackName, setTrackName] = useState('');
   const [category, setCategory] = useState('');
   const [bestLap, setBestLap] = useState('');
@@ -11,7 +11,13 @@ export const RaceForm = ({ onAddRace }) => {
       Alert.alert('Atenção', 'Preencha todos os dados da pista!');
       return;
     }
-    onAddRace(trackName, category, bestLap);
+    onSave({
+      id: Date.now().toString(),
+      trackName: trackName.trim(),
+      category: category.trim(),
+      bestLap: bestLap.trim(),
+      completed: false,
+    });
     setTrackName('');
     setCategory('');
     setBestLap('');
@@ -19,6 +25,9 @@ export const RaceForm = ({ onAddRace }) => {
 
   return (
     <View style={styles.form}>
+      <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+        <Text style={styles.closeButtonText}>Fechar</Text>
+      </TouchableOpacity>
       <Text style={styles.formTitle}>NOVA CORRIDA / CIRCUITO</Text>
       <TextInput
         style={styles.input}
@@ -46,10 +55,12 @@ export const RaceForm = ({ onAddRace }) => {
       </TouchableOpacity>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   form: { backgroundColor: '#1E1E2C', padding: 16, borderRadius: 8, marginBottom: 16 },
+  closeButton: { alignSelf: 'flex-end', paddingVertical: 6, paddingHorizontal: 4 },
+  closeButtonText: { color: '#A4B0BE', fontWeight: 'bold' },
   formTitle: { color: '#FF4757', fontWeight: 'bold', marginBottom: 12, fontSize: 14 },
   input: { backgroundColor: '#2F3542', color: '#FFF', borderRadius: 6, padding: 10, marginBottom: 10, borderWidth: 1, borderColor: '#57606F' },
   addButton: { backgroundColor: '#FF4757', padding: 12, borderRadius: 6, alignItems: 'center' },

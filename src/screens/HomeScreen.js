@@ -12,7 +12,6 @@ import {
 
 import RaceCard from '../components/RaceCard';
 import RaceForm from '../components/RaceForm';
-import TrackMap from '../components/TrackMap';
 import { getRaces, saveRaces } from '../storage/raceStorage';
 
 export default function HomeScreen() {
@@ -28,8 +27,12 @@ export default function HomeScreen() {
   }, []);
 
   const loadSavedRaces = async () => {
-    const storedRaces = await getRaces();
-    if (storedRaces) setRaces(storedRaces);
+    try {
+      const storedRaces = await getRaces();
+      if (storedRaces) setRaces(storedRaces);
+    } catch (error) {
+      console.log('Erro ao carregar corridas:', error);
+    }
   };
 
   const handleAddRace = async (newRace) => {
@@ -37,6 +40,20 @@ export default function HomeScreen() {
     setRaces(updated);
     await saveRaces(updated);
     setModalVisible(false);
+  };
+
+  const handleToggleComplete = async (raceId) => {
+    const updated = races.map((race) =>
+      race.id === raceId ? { ...race, completed: !race.completed } : race
+    );
+    setRaces(updated);
+    await saveRaces(updated);
+  };
+
+  const handleDeleteRace = async (raceId) => {
+    const updated = races.filter((race) => race.id !== raceId);
+    setRaces(updated);
+    await saveRaces(updated);
   };
 
   const toggleTheme = () => {
@@ -52,7 +69,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={[styles.container, dynamicStyles.container]}>
-      {/* Botão de Alternar Modo Claro / Escuro no Topo */}
+      {/* Cabeçalho com o botão do Tema */}
       <View style={styles.header}>
         <TouchableOpacity
           style={[styles.themeButton, dynamicStyles.buttonBg]}
@@ -64,10 +81,7 @@ export default function HomeScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Componente isolado do Mapa + Contador de KM */}
-      <TrackMap isDarkMode={isDarkMode} />
-
-      {/* Lista de Corridas */}
+      {/* Lista de Corridas Salvas */}
       <View style={styles.listContainer}>
         <View style={styles.listHeader}>
           <Text style={[styles.sectionTitle, dynamicStyles.textPrimary]}>
@@ -84,10 +98,14 @@ export default function HomeScreen() {
         <FlatList
           data={races}
           keyExtractor={(item, index) =>
-            item.id ? item.id.toString() : index.toString()
+            item && item.id ? item.id.toString() : index.toString()
           }
           renderItem={({ item }) => (
-            <RaceCard race={item} isDarkMode={isDarkMode} />
+            <RaceCard
+              race={item}
+              onToggleComplete={handleToggleComplete}
+              onDelete={handleDeleteRace}
+            />
           )}
           showsVerticalScrollIndicator={false}
           ListEmptyComponent={
@@ -116,7 +134,7 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 16,
-    paddingTop: 10,
+    paddingTop: 40,
     alignItems: 'flex-end',
   },
   themeButton: {
@@ -136,26 +154,26 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
   },
   addButton: {
     backgroundColor: '#3B82F6',
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     justifyContent: 'center',
     alignItems: 'center',
   },
   addButtonText: {
     color: '#FFF',
-    fontSize: 22,
+    fontSize: 24,
     fontWeight: 'bold',
-    lineHeight: 24,
+    lineHeight: 26,
   },
   emptyText: {
     textAlign: 'center',
-    marginTop: 20,
+    marginTop: 30,
     fontSize: 14,
   },
 });

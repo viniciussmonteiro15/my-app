@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
-export const RaceCard = ({ race, onToggleComplete, onDelete }) => {
+export default function RaceCard({ race, onToggleComplete, onDelete }) {
   return (
     <View style={[styles.card, race.completed && styles.cardCompleted]}>
       <View style={styles.info}>
@@ -31,7 +31,7 @@ export const RaceCard = ({ race, onToggleComplete, onDelete }) => {
       </View>
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   card: { backgroundColor: '#1E1E2C', padding: 16, borderRadius: 8, marginBottom: 12, flexDirection: 'row', justifyContent: 'space-between', borderLeftWidth: 5, borderLeftColor: '#FF4757' },
